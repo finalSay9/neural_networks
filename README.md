@@ -1,152 +1,388 @@
-# OCR App — Learning Project
+# OCR App
 
-An app that extracts text from images (ID cards, receipts, books, documents) using classical CV preprocessing, OCR engines (Tesseract / EasyOCR), and a custom CRNN model trained on Google Colab.
+<div align="center">
 
-This project is being built as a **learning exercise** — the goal is to understand each layer (preprocessing → OCR → post-processing) rather than just wire up a black-box pipeline.
+# 📄 OCR App
+
+### Production-Ready Optical Character Recognition Platform
+
+Extract text and structured information from images and scanned documents using computer vision, deep learning, and intelligent post-processing.
+
+![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)
+![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi)
+![OpenCV](https://img.shields.io/badge/OpenCV-Computer%20Vision-5C3EE8?logo=opencv)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-Deep%20Learning-FF6F00?logo=tensorflow)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker)
+
+</div>
 
 ---
 
-## Project Status
+## Overview
 
-- [ ] Preprocessing pipeline (OpenCV)
-- [ ] Baseline OCR with Tesseract / EasyOCR
-- [ ] Post-processing / structured field extraction
-- [ ] Custom CRNN training (Colab)
-- [ ] CRNN inference integrated into backend
-- [ ] Frontend
+OCR App is a modular Optical Character Recognition (OCR) platform designed to transform images and scanned documents into clean, structured, machine-readable data.
+
+The system combines classical computer vision techniques with modern deep learning models to deliver accurate text recognition across multiple document types. Its modular architecture enables different OCR engines to operate independently or together while exposing a unified API for seamless integration into other applications.
 
 ---
 
-## Architecture Overview
+# Features
+
+- Image enhancement and preprocessing
+- Automatic document detection
+- Perspective correction
+- Deskewing
+- Noise reduction
+- Adaptive thresholding
+- Multiple OCR engines
+  - Tesseract
+  - EasyOCR
+  - Custom CRNN Model
+- Structured data extraction
+- RESTful API
+- Dockerized deployment
+- Modular and extensible architecture
+
+---
+
+# Supported Documents
+
+- National IDs
+- Passports
+- Driver's Licenses
+- Receipts
+- Invoices
+- Books
+- Printed Documents
+- Forms
+- Business Cards
+- Certificates
+
+---
+
+# Architecture
 
 ```mermaid
 flowchart LR
-    A[Client Upload] --> B[FastAPI Backend]
-    B --> C[Preprocessing<br/>OpenCV]
+
+    A[Client]
+
+    A --> B[FastAPI Backend]
+
+    B --> C[Image Preprocessing]
+
     C --> D{OCR Engine}
-    D -->|baseline| E[Tesseract]
-    D -->|baseline| F[EasyOCR]
-    D -->|custom, later| G[CRNN Model]
-    E --> H[Post-processing<br/>Regex / Cleanup]
+
+    D --> E[Tesseract]
+
+    D --> F[EasyOCR]
+
+    D --> G[Custom CRNN]
+
+    E --> H[Post Processing]
+
     F --> H
+
     G --> H
-    H --> I[Structured Output<br/>JSON]
+
+    H --> I[Structured JSON]
+
     I --> J[Client Response]
 ```
 
 ---
 
-## Preprocessing Pipeline (Layer 2)
+# Image Preprocessing Pipeline
 
 ```mermaid
 flowchart TD
-    A[Raw Image] --> B[Grayscale Conversion]
-    B --> C[Thresholding<br/>Otsu / Adaptive]
-    C --> D[Noise Removal<br/>Blur / Morphology]
-    D --> E[Deskew<br/>Hough Transform]
-    E --> F[Contour Detection]
-    F --> G[Perspective Transform<br/>Crop to Document]
-    G --> H[Preprocessed Image<br/>ready for OCR]
+
+A[Input Image]
+--> B[Convert to Grayscale]
+--> C[Adaptive Thresholding]
+--> D[Noise Removal]
+--> E[Deskew Image]
+--> F[Document Detection]
+--> G[Perspective Correction]
+--> H[OCR Ready Image]
 ```
 
 ---
 
-## CRNN Model Flow (Layer 4)
+# Deep Learning OCR Pipeline
 
 ```mermaid
 flowchart LR
-    A[Input Image<br/>fixed height] --> B[CNN<br/>Feature Extraction]
-    B --> C[Feature Map<br/>sequence of columns]
-    C --> D[Bidirectional LSTM<br/>Sequence Modeling]
-    D --> E[CTC Decoder]
-    E --> F[Predicted Text]
+
+A[Input Image]
+--> B[CNN Feature Extraction]
+--> C[Feature Sequence]
+--> D[Bidirectional LSTM]
+--> E[CTC Decoder]
+--> F[Recognized Text]
 ```
 
 ---
 
-## Training Workflow (Colab-based)
+# Runtime Request Flow
 
 ```mermaid
 sequenceDiagram
-    participant Dev as You (local)
-    participant Colab as Google Colab (GPU)
-    participant Repo as training/ folder
-    participant Backend as backend/app/models
 
-    Dev->>Repo: Prepare dataset in training/dataset/
-    Dev->>Colab: Open train_crnn.ipynb, upload/mount dataset
-    Colab->>Colab: Train CRNN model
-    Colab-->>Dev: Export trained weights (.h5 / .pt)
-    Dev->>Backend: Copy weights into backend/app/models/
-    Backend->>Backend: crnn_engine.py loads model for inference
+participant User
+participant Frontend
+participant Backend
+participant Preprocessing
+participant OCR
+participant PostProcessing
+
+User->>Frontend: Upload Image
+
+Frontend->>Backend: POST /ocr/upload
+
+Backend->>Preprocessing: Enhance Image
+
+Preprocessing-->>Backend: Processed Image
+
+Backend->>OCR: Recognize Text
+
+OCR-->>Backend: Raw Text
+
+Backend->>PostProcessing: Extract Structured Data
+
+PostProcessing-->>Backend: Clean Output
+
+Backend-->>Frontend: JSON Response
+
+Frontend-->>User: Display Results
 ```
 
 ---
 
-## Request Flow (Runtime, once built)
+# Model Training Pipeline
 
 ```mermaid
-sequenceDiagram
-    participant U as User
-    participant F as Frontend
-    participant B as FastAPI Backend
-    participant P as Preprocessing
-    participant O as OCR Engine
-    participant Post as Post-processing
+flowchart LR
 
-    U->>F: Upload image (ID / receipt / book page)
-    F->>B: POST /ocr/upload
-    B->>P: Run preprocessing pipeline
-    P-->>B: Cleaned image
-    B->>O: Run OCR (Tesseract / EasyOCR / CRNN)
-    O-->>B: Raw extracted text
-    B->>Post: Regex / NER extraction
-    Post-->>B: Structured fields
-    B-->>F: JSON response
-    F-->>U: Display extracted data
+A[Training Dataset]
+--> B[Image Preprocessing]
+--> C[CRNN Training]
+--> D[Model Evaluation]
+--> E[Export Model]
+--> F[Inference Engine]
 ```
 
 ---
 
-## Folder Structure
+# Project Structure
 
-```
+```text
 ocr-app/
-├── backend/            # FastAPI app: preprocessing, OCR engines, post-processing
-├── frontend/            # UI (built later)
-├── training/            # Colab notebooks + dataset, model export
-├── sample_images/        # Test images: ids, receipts, books
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── preprocessing/
+│   │   ├── engines/
+│   │   ├── postprocessing/
+│   │   ├── models/
+│   │   ├── services/
+│   │   └── main.py
+│   │
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── frontend/
+│
+├── training/
+│   ├── dataset/
+│   ├── notebooks/
+│   ├── models/
+│   └── scripts/
+│
+├── sample_images/
+│
 ├── docker-compose.yml
+├── .gitignore
 └── README.md
 ```
 
 ---
 
-## Tech Stack
+# Technology Stack
 
-| Layer            | Tools                              |
-|-------------------|-------------------------------------|
-| Preprocessing      | OpenCV, Pillow                      |
-| OCR (baseline)     | Tesseract, EasyOCR                   |
-| OCR (custom)       | TensorFlow/Keras or PyTorch, CRNN, CTC loss |
-| Post-processing     | Regex, spaCy (optional)               |
-| Backend            | FastAPI, Uvicorn                     |
-| Training           | Google Colab (GPU)                    |
-| Deployment          | Docker, Docker Compose                |
+| Layer | Technologies |
+|---------|--------------|
+| Backend | FastAPI, Uvicorn |
+| Computer Vision | OpenCV, Pillow |
+| OCR Engines | Tesseract, EasyOCR |
+| Deep Learning | TensorFlow / Keras or PyTorch |
+| Recognition Model | CRNN + CTC Loss |
+| Information Extraction | Regex, spaCy |
+| Deployment | Docker, Docker Compose |
 
 ---
 
-## Running Locally
+# OCR Processing Pipeline
 
-```bash
-docker-compose up --build
+```text
+Input Image
+      │
+      ▼
+Image Enhancement
+      │
+      ▼
+Document Detection
+      │
+      ▼
+OCR Recognition
+      │
+      ▼
+Post Processing
+      │
+      ▼
+Structured Information
+      │
+      ▼
+JSON Response
 ```
 
-Backend available at `http://localhost:8000`.
-Health check: `GET /` → `{"status": "ok"}`
+---
+
+# API Endpoints
+
+## Upload Image
+
+```http
+POST /ocr/upload
+```
+
+Uploads an image and returns structured OCR results.
 
 ---
 
-## Learning Notes
+## Health Check
 
-Research topics tracked as I go — see individual module docstrings and commit messages for what each piece does and why.
+```http
+GET /
+```
+
+Response
+
+```json
+{
+    "status": "ok"
+}
+```
+
+---
+
+# Example Response
+
+```json
+{
+  "document_type": "receipt",
+  "merchant": "Elite Supermarket",
+  "date": "2026-07-20",
+  "currency": "MWK",
+  "total": 18500,
+  "items": [
+    {
+      "name": "Bread",
+      "price": 2500
+    },
+    {
+      "name": "Milk",
+      "price": 3000
+    }
+  ],
+  "raw_text": "ELITE SUPERMARKET\nBread 2500\nMilk 3000\nTOTAL 18500"
+}
+```
+
+---
+
+# Getting Started
+
+## Clone Repository
+
+```bash
+git clone https://github.com/yourusername/ocr-app.git
+```
+
+```bash
+cd ocr-app
+```
+
+---
+
+## Build Containers
+
+```bash
+docker compose up --build
+```
+
+Backend
+
+```
+http://localhost:8000
+```
+
+Interactive API Documentation
+
+```
+http://localhost:8000/docs
+```
+
+---
+
+# Future Roadmap
+
+- Handwritten Text Recognition
+- PDF OCR
+- Batch Processing
+- Table Detection
+- Layout Analysis
+- Named Entity Recognition
+- Key-Value Pair Extraction
+- Multi-language OCR
+- Confidence Score Visualization
+- ONNX Runtime Optimization
+- GPU Acceleration
+- Document Classification
+
+---
+
+# Design Principles
+
+The project is built around the following principles:
+
+- Modular Architecture
+- High Accuracy
+- Scalability
+- Maintainability
+- Extensibility
+- Production Readiness
+- API First Design
+
+---
+
+# Vision
+
+OCR App aims to provide a robust, scalable, and extensible OCR platform capable of transforming unstructured visual documents into structured, machine-readable information through the integration of computer vision, deep learning, and intelligent document understanding.
+
+The architecture is designed to support future advancements in document AI while maintaining flexibility for integrating new recognition models, preprocessing techniques, and post-processing pipelines.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
+
+---
+
+<div align="center">
+
+**Built with ❤️ using FastAPI, OpenCV, TensorFlow, and Docker.**
+
+</div>
