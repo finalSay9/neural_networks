@@ -1,31 +1,23 @@
+import random
 
-#lets create a layer this time
+inputs = [1, 2, 3, 1.1, 2.3]
 
-inputs = [2, 1.2, 3, 4.0]
+times = int(input("How many neurons? "))
 
-weights1 = [0.1, 0.3, -0.4, 0.4]
-weights2 = [0.2, 0.1, 1, 2]
-weights3 = [1, 2, -0.5, -0.1]
-bias1 = 2
-bias2 = 1
-bias3 = 3
+for i in range(times):
 
-outputs = [
-    inputs[0]*weights1[0] +
-    inputs[1]*weights1[1] +
-    inputs[2]*weights1[2] +
-    inputs[3]*weights1[3] + bias1,
-  
-    inputs[0]*weights2[0] +
-    inputs[1]*weights2[1] +
-    inputs[2]*weights2[2] +
-    inputs[3]*weights2[3] + bias2,
-  
-  
-   inputs[0]*weights3[0] +
-   inputs[1]*weights3[1] +
-   inputs[2]*weights3[2] +
-   inputs[3]*weights3[3] + bias3
- ]
+    weights = [random.uniform(-1, 1) for _ in range(len(inputs))]
+    bias = random.uniform(-1, 1)
 
-print(outputs)
+    output = 0
+
+    for x, w in zip(inputs, weights):
+        output += x * w
+
+    output += bias
+
+    print(f"Neuron {i+1}")
+    print("Weights:", weights)
+    print("Bias:", bias)
+    print("Output:", output)
+    print()
