@@ -2,7 +2,7 @@
 
 <div align="center">
 
-# 📄 OCR App
+#  OCR App
 
 ### Production-Ready Optical Character Recognition Platform
 
