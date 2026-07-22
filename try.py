@@ -1,9 +1,11 @@
-import random
+class Counter:
+    count_insta = 0
+    def __init__(self):
+        type(self).count_insta + 1
 
+Counter()
+Counter()
+Counter()
 
-vec1 = [1,2,3,4,5]
-vec2 = [5,6,7,8,9]
-
-
-for vector1, vector2 in zip(vec1, vec2):
-    
+count = Counter()
+print(count)
