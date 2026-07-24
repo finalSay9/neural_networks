@@ -1,5 +1,4 @@
 import math
-
 class Circle:
     
     def __init__(self, radius):
@@ -16,3 +15,6 @@ class Circle:
         if not isinstance(value, int | float) or value <= 0:
             raise ValueError("Positive numbers expected")
         self._radius = value
+
+    def calculate_area(self):
+        return math.pi * self.radius ** 2
